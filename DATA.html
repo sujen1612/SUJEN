@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <title>தரம் 6 - 11 மாணவர் எண்ணிக்கைப் பதிவேடு - பூவரசங்குளம் ம.வி</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f4f6f9; color: #333; }
+        .container { max-width: 950px; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin: auto; }
+        h2 { color: #2c3e50; text-align: center; margin-bottom: 5px; }
+        .school-title { text-align: center; color: #16a085; font-weight: bold; margin-bottom: 20px; font-size: 18px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #555; }
+        select, input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .btn-container { display: flex; gap: 10px; margin-top: 10px; }
+        button { background-color: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; transition: background 0.3s; }
+        button:hover { background-color: #219653; }
+        .btn-export { background-color: #2980b9; }
+        .btn-export:hover { background-color: #1f618d; }
+        table { width: 100%; margin-top: 25px; border-collapse: collapse; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #2c3e50; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>தரம் 6 - 11 மாணவர் எண்ணிக்கைப் பதிவு அமைப்பு</h2>
+    <div class="school-title">பாடசாலை: POOVARASANKULAM M.V</div>
+    
+    <form id="studentForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="grade">தரம்:</label>
+                <select id="grade" required>
+                    <option value="">தரத்தைத் தேர்ந்தெடுக்கவும்</option>
+                    <option value="தரம் 6">தரம் 6</option>
+                    <option value="தரம் 7">தரம் 7</option>
+                    <option value="தரம் 8">தரம் 8</option>
+                    <option value="தரம் 9">தரம் 9</option>
+                    <option value="தரம் 10">தரம் 10</option>
+                    <option value="தரம் 11">தரம் 11</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="section">பிரிவு / வகுப்பு:</label>
+                <input type="text" id="section" placeholder="எ.கா: A, B, C" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectCategory">பாடப் பிரிவு:</label>
+                <select id="subjectCategory" onchange="updateSubjects()" required>
+                    <option value="">பாடப் பிரிவைத் தேர்ந்தெடுக்கவும்</option>
+                    <option value="பொதுப் பாடங்கள்">பொதுப் பாடங்கள்</option>
+                    <option value="முதலாம் பாடத் தொகுதி">முதலாம் பாடத் தொகுதி</option>
+                    <option value="இரண்டாம் பாடத் தொகுதி">இரண்டாம் பாடத் தொகுதி</option>
+                    <option value="மூன்றாம் பாடத் தொகுதி">மூன்றாம் பாடத் தொகுதி</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectName">பாடம்:</label>
+                <select id="subjectName" onchange="checkSubSubject()" required>
+                    <option value="">முதலில் பாடப் பிரிவைத் தேர்ந்தெடுக்கவும்</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="subSubjectGroup" style="display: none; grid-column: span 2;">
+                <label id="subLabel" for="subSubjectName">உள் பிரிவு / விவரம்:</label>
+                <select id="subSubjectName">
+                    <option value="">தேர்ந்தெடுக்கவும்</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="boysCount">ஆண் மாணவர்களின் எண்ணிக்கை:</label>
+                <input type="number" id="boysCount" min="0" value="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="girlsCount">பெண் மாணவர்களின் எண்ணிக்கை:</label>
+                <input type="number" id="girlsCount" min="0" value="0" required>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button type="submit" id="submitBtn">தரவை Google Sheet-ல் பதிவேற்றுக</button>
+            <button type="button" class="btn-export" onclick="exportToCSV()">Excel (CSV) கோப்பாக பதிவிறக்குக</button>
+        </div>
+    </form>
+
+    <h3 style="margin-top: 30px;">பதிவு செய்யப்பட்ட விவரங்கள்</h3>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>பாடசாலையின் பெயர்</th>
+                <th>தரம்</th>
+                <th>பிரிவு</th>
+                <th>பாடப் பிரிவு</th>
+                <th>பாடம் / விவரம்</th>
+                <th>ஆண்</th>
+                <th>பெண்</th>
+                <th>மொத்தம்</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- தரவுகள் இங்கே dynamically சேர்க்கப்படும் -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // வழங்கப்பட்ட Google Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwt8vgSEFvpc00MYIjd5I1Tcs0U9TYe3iMLqZmhpmCK-Ci041ffByMEkREqu7Fcw_4f3g/exec";
+    const SCHOOL_NAME = "POOVARASANKULAM M.V";
+
+    const subjectsData = {
+        "பொதுப் பாடங்கள்": [
+            "சமயம்",
+            "மொழியும் இலக்கியமும்",
+            "கணிதம்",
+            "ஆங்கிலம்",
+            "வரலாறு",
+            "விஞ்ஞானம்"
+        ],
+        "முதலாம் பாடத் தொகுதி": [
+            "புவியியல்",
+            "குடிடியற் கல்வி",
+            "முயற்சியாண்மைத் கற்கை",
+            "இரண்டாம் மொழியாக",
+            "வணிகமும் கணக்கீட்டுக் கல்வியும்"
+        ],
+        "இரண்டாம் பாடத் தொகுதி": [
+            "சங்கீதம்",
+            "சித்திரம்",
+            "நடனம்",
+            "நாடகமும் அரங்கியலும்",
+            "இலக்கிய நயம்"
+        ],
+        "மூன்றாம் பாடத் தொகுதி": [
+            "தகவல் தொடர்பாடல் தொழில்நுட்பவியல்",
+            "விவசாயமும் உணவுத் தொழில்நுட்பவியலும்",
+            "மனைப் பொருளியல்",
+            "சுகாதாரமும் உடற்கல்வியும்"
+        ]
+    };
+
+    const subOptionsData = {
+        "சமயம்": ["சைவநெறி", "கத்தோலிக்க சமயம்", "கிறிஸ்தவம்"],
+        "மொழியும் இலக்கியமும்": ["சிங்களம்", "தமிழ்"],
+        "இரண்டாம் மொழியாக": ["சிங்களம்", "தமிழ்"],
+        "சங்கீதம்": ["கிழைத்தேய", "மேலைத்தேய", "கர்நாடகம்"],
+        "நடனம்": ["சுதேச", "பரதம்"],
+        "நாடகமும் அரங்கியலும்": ["சிங்களம்", "தமிழ்", "ஆங்கிலம்"],
+        "இலக்கிய நயம்": ["சிங்களம்", "தமிழ்", "ஆங்கிலம்", "அரபு"]
+    };
+
+    function updateSubjects() {
+        let categorySelect = document.getElementById('subjectCategory').value;
+        let subjectSelect = document.getElementById('subjectName');
+        
+        subjectSelect.innerHTML = '<option value="">பாடத்தைத் தேர்ந்தெடுக்கவும்</option>';
+        document.getElementById('subSubjectGroup').style.display = 'none';
+        
+        if (categorySelect && subjectsData[categorySelect]) {
+            subjectsData[categorySelect].forEach(subject => {
+                let option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+        }
+    }
+
+    function checkSubSubject() {
+        let subjectSelect = document.getElementById('subjectName').value;
+        let subGroup = document.getElementById('subSubjectGroup');
+        let subSelect = document.getElementById('subSubjectName');
+        let subLabel = document.getElementById('subLabel');
+
+        subSelect.innerHTML = '<option value="">தேர்ந்தெடுக்கவும்</option>';
+
+        if (subOptionsData[subjectSelect]) {
+            subOptionsData[subjectSelect].forEach(item => {
+                let option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                subSelect.appendChild(option);
+            });
+            subLabel.textContent = subjectSelect + " பிரிவைத் தேர்ந்தெடுக்கவும்:";
+            subGroup.style.display = 'block';
+            subSelect.required = true;
+        } else {
+            subGroup.style.display = 'none';
+            subSelect.required = false;
+        }
+    }
+
+    document.getElementById('studentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        let grade = document.getElementById('grade').value;
+        let section = document.getElementById('section').value;
+        let category = document.getElementById('subjectCategory').value;
+        let subject = document.getElementById('subjectName').value;
+        let subSubject = document.getElementById('subSubjectName').value;
+        
+        let finalSubject = subSubject ? `${subject} (${subSubject})` : subject;
+
+        let boys = parseInt(document.getElementById('boysCount').value) || 0;
+        let girls = parseInt(document.getElementById('girlsCount').value) || 0;
+        let total = boys + girls;
+
+        let formData = {
+            school: SCHOOL_NAME,
+            grade: grade,
+            section: section,
+            category: category,
+            subject: finalSubject,
+            boys: boys,
+            girls: girls,
+            total: total
+        };
+
+        let submitBtn = document.getElementById('submitBtn');
+        submitBtn.textContent = "பதிவேற்றப்படுகிறது...";
+        submitBtn.disabled = true;
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            let tableRow = `<tr>
+                <td>${SCHOOL_NAME}</td>
+                <td>${grade}</td>
+                <td>${section}</td>
+                <td>${category}</td>
+                <td>${finalSubject}</td>
+                <td>${boys}</td>
+                <td>${girls}</td>
+                <td>${total}</td>
+            </tr>`;
+
+            document.getElementById('resultTable').querySelector('tbody').innerHTML += tableRow;
+            document.getElementById('studentForm').reset();
+            document.getElementById('subjectName').innerHTML = '<option value="">முதலில் பாடப் பிரிவைத் தேர்ந்தெடுக்கவும்</option>';
+            document.getElementById('subSubjectGroup').style.display = 'none';
+            alert('தரவு வெற்றிகரமாக Google Sheet-ல் பதிவேற்றப்பட்டது!');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('பதிவேற்றுவதில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.');
+        } finally {
+            submitBtn.textContent = "தரவை Google Sheet-ல் பதிவேற்றுக";
+            submitBtn.disabled = false;
+        }
+    });
+
+    function exportToCSV() {
+        let table = document.getElementById('resultTable');
+        let rows = table.querySelectorAll('tr');
+        if (rows.length <= 1) {
+            alert('பதிவு செய்ய எந்த தரவுகளும் இல்லை!');
+            return;
+        }
+
+        let csvContent = "\uFEFF"; 
+        rows.forEach(row => {
+            let cols = row.querySelectorAll('td, th');
+            let data = [];
+            cols.forEach(col => data.push('"' + col.innerText.replace(/"/g, '""') + '"'));
+            csvContent += data.join(',') + "\r\n";
+        });
+
+        let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = 'Poovarasankulam_MV_Student_Count.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+</script>
+
+</body>
+</html>
